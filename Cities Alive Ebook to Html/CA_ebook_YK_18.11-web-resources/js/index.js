@@ -67,16 +67,26 @@ function para (i,e) {
     page.story.push(item)
     break
   case 'BOOK_BODY_Quotes_quote':
-    item = {type:'html', id:id(), text:('<blockquote>' + $(e).html() + '</blockquote>')}
-    page.story.push(item)
+    var prev = page.story[page.story.length-1]
+    if (prev && (m = prev.text.match(/^(.*)<\/blockquote>$/))) {
+      prev.text = m[1] + "<br>" + $(e).html() + '</blockquote>'
+    } else {
+      item = {type:'html', id:id(), text:('<blockquote>' + $(e).html() + '</blockquote>')}
+      page.story.push(item)
+    }
     break
   case 'BOOK_BODY_Images_Figure':
     item = {type:'image', id:id(), text:'Lorem Pixel', url:'http://lorempixel.com/420/300/'}
     page.story.push(item)
     break
   case 'BOOK_BODY_Images_Caption':
-    item = {type:'html', id:id(), text:('<font size=-1><i>' + $(e).html() + '</i></font>')}
-    page.story.push(item)
+    var prev = page.story[page.story.length-1]
+    if (prev && prev.type == 'image') {
+      prev.text = $(e).text()
+    } else {
+      item = {type:'html', id:id(), text:('<font size=-1><i>' + $(e).html() + '</i></font>')}
+      page.story.push(item)
+    }
     break
   case 'BOOK_BODY_Lists_list':
   case 'BOOK_BODY_footnote':
