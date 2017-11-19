@@ -21,6 +21,7 @@ function begin (e,f) {
   site[slug] = page
   // start another
   longtitle = title = $(e).text().replace(/\d+$/,'')
+  console.log('begin',longtitle)
   if (f) {
     item = {type:'markdown', id:id(), text:(f + longtitle)}
   } else {
@@ -45,36 +46,51 @@ function titlecase (title) {
 
 $(body).find('p').map(para)
 function para (i,e) {
-  switch (e.className) {
-  case 'BOOK_Titles_Section-subtitle':
+  selector = e.className.match(/^([^ -]+)/)[0]
+  switch (selector) {
+  case 'BOOK_Titles_Section':
     begin(e,'# ')
     break
-  case 'BOOK_Titles_Chapter-title':
-  case 'BOOK_Titles_Chapter-Intro--etc':
+  case 'BOOK_Titles_Chapter':
     begin(e)
     break
-  case 'BOOK_BODY_Quotes_quote-next-page':
-  case 'BOOK_BODY_Quotes_quote-author':
+  case 'BOOK_Titles_Photo':
+    item = {type:'html', id:id(), text:('<h3>' + $(e).html() + '</h3>')}
+    page.story.push(item)
+    break
+  case 'BOOK_BODY_Photo':
+    item = {type:'html', id:id(), text:('<h5>' + $(e).html() + '</h5>')}
+    page.story.push(item)
+    break
+  case 'BOOK_BODY_':
+    item = {type:'html', id:id(), text:('<center>* * *</center>')}
+    page.story.push(item)
+    break
+  case 'BOOK_BODY_Quotes_quote':
     item = {type:'html', id:id(), text:('<blockquote>' + $(e).html() + '</blockquote>')}
     page.story.push(item)
     break
-  case 'BOOK_BODY_Images_Figure-chapter':
-  case 'BOOK_BODY_Images_Figure-centered':
+  case 'BOOK_BODY_Images_Figure':
     item = {type:'image', id:id(), text:'Lorem Pixel', url:'http://lorempixel.com/420/300/'}
     page.story.push(item)
     break
-  case 'BOOK_BODY_Lists_list-references':
+  case 'BOOK_BODY_Images_Caption':
+    item = {type:'html', id:id(), text:('<font size=-1><i>' + $(e).html() + '</i></font>')}
+    page.story.push(item)
+    break
+  case 'BOOK_BODY_Lists_list':
   case 'BOOK_BODY_footnote':
     item = {type:'html', id:id(), text:('<font size=-1>' + $(e).html() + '</font>')}
     page.story.push(item)
     break
-  case 'BOOK_BODY_Lists_list-body':
-  case 'BOOK_BODY_body-text':
+  case 'BOOK_BODY_body':
     item = {type:'html', id:id(), text:$(e).html()}
     page.story.push(item)
     break
+  case 'BREAK':
+    break
   default:
-    console.log(e.className)
+    console.log(selector)
     item = {type:'html', id:id(), text:e.className + ' ⇒ ' + $(e).html()}
     page.story.push(item)    
   }
