@@ -76,7 +76,8 @@ function para (i,e) {
     }
     break
   case 'BOOK_BODY_Images_Figure':
-    item = {type:'image', id:id(), text:'Lorem Pixel', url:'http://lorempixel.com/420/300/'}
+    var img = $(e).find('img').get(0)
+    item = {type:'image', id:id(), text:'No Caption', url:dataurl(img)}
     page.story.push(item)
     break
   case 'BOOK_BODY_Images_Caption':
@@ -133,6 +134,39 @@ function download(text, name, type) {
   a.href = URL.createObjectURL(file);
   a.download = name;
   a.click();
+}
+
+/* decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ * Original source: https://github.com/fedwiki/wiki-client/blob/ad505eaf6020141ebf7bc66b87b41671aac6713a/lib/factory.coffee#L170-L189 */
+
+const resizeImage = function(dataURL) {
+  const smallEnough = src => (src.width <= 500) || (src.height <= 300);
+  var squeezeSteps = function(src) {
+    let cH, cW;
+    if (smallEnough(src)) { return src; }
+    const canvas = document.createElement('canvas');
+    canvas.width = (cW = src.width / 2);
+    canvas.height = (cH = src.height / 2);
+    const context = canvas.getContext('2d');
+    context.drawImage(src, 0, 0, cW, cH);
+    return squeezeSteps(canvas);
+  };
+  const img = new Image;
+  img.src = dataURL;
+  if (smallEnough(img)) { return dataURL; }
+  return squeezeSteps(img).toDataURL('image/jpeg', .5);  // medium quality encoding
+};
+
+function dataurl (src) {
+  const canvas = document.createElement('canvas')
+  cW = canvas.width = src.width
+  cH = canvas.height = src.height
+  const context = canvas.getContext('2d')
+  context.drawImage(src, 0, 0, cW, cH)
+  console.log('dataurl',cW, cH)
+  return canvas.toDataURL('image/jpeg', .9)
 }
 
 })()
